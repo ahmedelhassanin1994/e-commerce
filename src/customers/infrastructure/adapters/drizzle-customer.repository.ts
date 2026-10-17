@@ -20,7 +20,14 @@ export class DrizzleCustomerRepository implements CustomerRepositoryPort {
     const data = DrizzleCustomerRepository.toPersistence(customer);
     await this.db.insert(customers).values(data).onConflictDoUpdate({
       target: customers.id,
-      set: data,
+      set: {
+        email: data.email,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        phone: data.phone,
+        isActive: data.isActive,
+        updatedAt: data.updatedAt,
+      },
     });
   }
   async findById(id: CustomerId): Promise<Customer | null> {

@@ -1,0 +1,56 @@
+services:
+  app:
+    build:
+      context: .
+      target: production
+    container_name: e-commerce-app
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 8079
+      MONGO_URL: mongodb://mongodb:27017
+      MONGO_DB_NAME: ${DATABASE_NAME}
+      POSTGRES_DATABASE_URL: postgres://postgres:postgres@postgres:5432/${DATABASE_NAME}
+      POSTGRES_CONNECTION_STRING: postgresql://postgres:postgres@postgres:5432/e-commerce
+    ports:
+      - "8079:8079"
+
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.runCommand({ ping: 1 }).ok' localhost:27017/test"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${DATABASE_NAME}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ${DATABASE_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  mongodb_data:
+  postgres_data:

@@ -16,16 +16,20 @@ export class DrizzleCustomerRepository implements CustomerRepositoryPort {
         
     }
 
-  save(customer: Customer): Promise<void> {
+  async save(customer: Customer): Promise<void> {
+    const data = DrizzleCustomerRepository.toPersistence(customer);
+    await this.db.insert(customers).values(data).onConflictDoUpdate({
+      target: customers.id,
+      set: data,
+    });
+  }
+  async findById(id: CustomerId): Promise<Customer | null> {
     throw new Error("Method not implemented.");
   }
-  findById(id: CustomerId): Promise<Customer | null> {
+  async findByEmail(email: Email): Promise<Customer | null> {
     throw new Error("Method not implemented.");
   }
-  findByEmail(email: Email): Promise<Customer | null> {
-    throw new Error("Method not implemented.");
-  }
-  findAll(): Promise<Customer[]> {
+  async findAll(): Promise<Customer[]> {
     throw new Error("Method not implemented.");
   }
   delete(id: CustomerId): Promise<void> {

@@ -8,7 +8,7 @@ export const  customers= pgTable("customers", {
     lastName: varchar("lastName", { length: 100 }).notNull(),
     phone: varchar("phone", { length: 20 }),
     isActive: boolean("is_active").notNull().default(true),
-    password: varchar("password", { length: 100 }).notNull(),
+    password: varchar("password", { length: 100 }),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
         

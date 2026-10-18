@@ -4,6 +4,7 @@ import { MongoModule } from "./shared/infrastructure/database/mongodb/mongo.modu
 import { DrizzleModule } from "./shared/infrastructure/database/postgres/drizzle.module.js";
 import { CqrsModule } from "@nestjs/cqrs";
 import { ProductModule } from "./product/product.module.js";
+import { CustomersModule } from "./customers/customers.module.js";
 
 @Module({
   imports: [
@@ -11,7 +12,8 @@ import { ProductModule } from "./product/product.module.js";
       ConfigModule.forRoot({isGlobal: true},),  
       MongoModule,
       DrizzleModule,
-      ProductModule
+      ProductModule,
+      CustomersModule
   ],  
   controllers: [],
   providers: [],

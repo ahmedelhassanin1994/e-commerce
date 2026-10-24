@@ -1,0 +1,12 @@
+#!/bin/sh
+
+commit_msg=$(head -n 1 "$1")
+regex="^(feat|fix|chore|refactor|docs|style|test|ci|build)(\\(.*\\))?: .+$|^Merge .+$"
+
+if ! printf '%s\n' "$commit_msg" | grep -Eq "$regex"; then
+  echo "Error: Invalid commit message format."
+  echo "Expected format: 'type: description' or 'type(scope): description'"
+  echo "Allowed types: feat, fix, chore, refactor, docs, style, test, ci, build"
+  echo "Example: 'feat(auth): add login screen'"
+  exit 1
+fi

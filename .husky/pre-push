@@ -1,0 +1,50 @@
+#!/bin/sh
+
+read local_ref local_sha remote_ref remote_sha
+
+if [ -z "$local_ref" ]; then
+  CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+else
+  CURRENT_BRANCH=$(printf '%s\n' "$local_ref" | sed 's|refs/heads/||')
+fi
+
+echo "🧪 Checking branch name: '$CURRENT_BRANCH'"
+
+case "$CURRENT_BRANCH" in
+  main|develop|feature/*|fix/*|hotfix/*|release/*)
+    ;;
+  *)
+    echo "❌ Error: Invalid branch name '$CURRENT_BRANCH'."
+    echo "Allowed patterns: main, develop, feature/*, fix/*, hotfix/*, release/*"
+    exit 1
+    ;;
+esac
+
+echo "✅ Branch name validation passed."
+
+if [ -z "$local_sha" ]; then
+  local_sha="HEAD"
+  remote_sha="HEAD~1"
+fi
+
+case "$remote_sha" in
+  0000000000000000000000000000000000000000|0000000000000000000000000000000000000000000000000000000000000000)
+    BASE=$(git merge-base HEAD origin/main 2>/dev/null || echo "HEAD~1")
+    RANGE="$BASE...$local_sha"
+    ;;
+  *)
+    RANGE="$remote_sha..$local_sha"
+    ;;
+esac
+
+echo "🔍 Running Gitleaks security scan..."
+if command -v gitleaks >/dev/null 2>&1; then
+  if ! gitleaks detect --log-opts="$RANGE" --no-banner; then
+    echo "❌ Gitleaks detected secrets in the commits to be pushed."
+    exit 1
+  fi
+else
+  echo "⚠️ Gitleaks not found. Skipping secret detection."
+fi
+
+echo "✅ All code checks passed!"

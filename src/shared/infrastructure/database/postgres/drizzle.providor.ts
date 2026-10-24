@@ -1,7 +1,7 @@
 import { ConfigService } from "@nestjs/config";
 import { drizzle, PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import * as schema from "./schema/products.schema.js";
+import * as schema from "./schema/index.js";
 import { sql } from "drizzle-orm/sql/sql";
 
 export const DRIZZLE = Symbol.for("DRIZZLE");
@@ -21,5 +21,4 @@ export const DrizzleProvider = {
         return db;
     },
 }
-
 

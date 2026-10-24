@@ -16,6 +16,6 @@ export class  RegisterCustomerDto {
   @MaxLength(100)
   lastName: string;
 
-  @IsPhoneNumber()
+  @IsPhoneNumber('EG')
   phone: string;
 }

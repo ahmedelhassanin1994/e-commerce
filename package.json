@@ -9,6 +9,7 @@
   "scripts": {
     "build": "nest build",
     "deploy": "nest deploy",
+    "db:migrate": "drizzle-kit migrate",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",

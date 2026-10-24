@@ -52,6 +52,12 @@ docker compose up --build
 
 The application is available on port `8079`.
 
+Apply the PostgreSQL migrations before starting the application:
+
+```bash
+pnpm db:migrate
+```
+
 ## Compile and run the project
 
 ```bash

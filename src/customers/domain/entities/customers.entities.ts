@@ -1,8 +1,7 @@
-import { AggregateRoot } from "@nestjs/cqrs";
-import { CustomerRegisteredEvent } from "../events/customer-registered.event.js";
-import { CustomerId } from "../value-objects/customer-id.vo.js";
-import { Email } from "../value-objects/email.vo.js";
-
+import { AggregateRoot } from '@nestjs/cqrs';
+import { CustomerId } from '../value-objects/customer-id.vo.js';
+import { Email } from '../value-objects/email.vo.js';
+import { CustomerRegisteredEvent } from '../events/customer-registered.event.js';
 
 interface CustomerProps {
   id: CustomerId;

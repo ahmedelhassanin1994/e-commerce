@@ -50,6 +50,10 @@ application and its databases in containers instead, start Docker and run:
 docker compose up --build
 ```
 
+Email notifications use `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`,
+and `SMTP_FROM`. `SMTP_SECURE` is optional; when omitted, it defaults to `true`
+for port `465` and `false` for other ports.
+
 The application is available on port `8079`.
 
 Swagger UI is available at `/api/docs` (for example, `http://localhost:8079/api/docs`).

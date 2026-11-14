@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "scripts": {
     "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "eslint \"{src,test}/**/*.ts\"",

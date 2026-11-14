@@ -1,20 +1,20 @@
 import { describe, expect, it } from 'vitest';
 import { Entity } from './entity.js';
-import { UniqueEntityId } from './value-objects/unique-entity-id.js';
+import { UniqueId } from './value-objects/unique-entity-id.js';
 
 class TestEntity extends Entity {
-  constructor(id: UniqueEntityId) {
+  constructor(id: UniqueId) {
     super(id);
   }
 }
 
-describe('Entity and UniqueEntityId', () => {
+describe('Entity and UniqueId', () => {
   it('compares entities by ID and formats its string representation', () => {
-    const first = new TestEntity(new UniqueEntityId('same-id'));
-    const second = new TestEntity(new UniqueEntityId('same-id'));
-    const different = new TestEntity(new UniqueEntityId('other-id'));
+    const first = new TestEntity(new UniqueId('same-id'));
+    const second = new TestEntity(new UniqueId('same-id'));
+    const different = new TestEntity(new UniqueId('other-id'));
 
-    expect(first.getId().value).toBe('same-id');
+    expect(first.getId().getValue()).toBe('same-id');
     expect(first.equals(second)).toBe(true);
     expect(first.equals(different)).toBe(false);
     expect(first.equals(null as unknown as Entity)).toBe(false);
@@ -22,11 +22,11 @@ describe('Entity and UniqueEntityId', () => {
   });
 
   it('creates unique IDs when none are supplied', () => {
-    const first = new UniqueEntityId();
-    const second = new UniqueEntityId();
+    const first = new UniqueId();
+    const second = new UniqueId();
 
-    expect(first.value).not.toBe(second.value);
-    expect(first.equals()).toBe(false);
-    expect(first.toString()).toBe(first.value);
+    expect(first.getValue()).not.toBe(second.getValue());
+    expect(first.equals(second)).toBe(false);
+    expect(first.toString()).toBe(first.getValue());
   });
 });

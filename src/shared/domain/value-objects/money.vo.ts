@@ -1,57 +1,71 @@
-import { DomainException } from "../excptions/domain.excption.js";
+import { DomainException } from '../excptions/domain.excption.js';
 
 export class Money {
-    private constructor(private readonly amount: number, private readonly currency: string) { }
-    
-    static create(amount: number, currency: string = 'USD'): Money {
-        if (amount < 0) {
-            throw new DomainException('Amount cannot be negative');
-        }
-        const normalizedAmount = Math.max(0, Math.floor(amount * 100)) / 100; // Normalize to two decimal places
-        const normalizedCurrency = currency.toUpperCase();
+  private constructor(
+    private readonly amount: number,
+    private readonly currency: string,
+  ) {}
 
-        return new Money(normalizedAmount, normalizedCurrency);
-    } 
-    
-    getAmount(): number {
-        return this.amount;
+  static create(amount: number, currency: string = 'USD'): Money {
+    if (amount < 0) {
+      throw new DomainException('Money amount cannot be negative');
     }
 
-    getCurrency(): string {
-        return this.currency;
-    }
+    const normalized = Math.round(amount * 100) / 100;
+    return new Money(normalized, currency.toUpperCase());
+  }
 
-    add(other: Money): Money {
-        if (this.currency !== other.currency) {
-            throw new DomainException('Cannot add amounts with different currencies');
-        }
-        return new Money(this.amount + other.amount, this.currency);
-    }
+  static zero(currency: string = 'USD'): Money {
+    return new Money(0, currency.toUpperCase());
+  }
 
-    subtract(other: Money): Money {
-        if (this.currency !== other.currency) {
-            throw new DomainException('Cannot subtract amounts with different currencies');
-        }
-        const resultAmount = this.amount - other.amount;
-        if (resultAmount < 0) {
-            throw new DomainException('Resulting amount cannot be negative');
-        }
-        return new Money(resultAmount, this.currency);
-    }
+  static fromCents(cents: number, currency: string = 'USD'): Money {
+    return new Money(cents / 100, currency.toUpperCase());
+  }
 
-    equals(other: Money): boolean {
-        return this.amount === other.amount && this.currency === other.currency;
-    }
+  add(other: Money): Money {
+    this.assertSameCurrency(other);
+    return Money.create(this.amount + other.amount, this.currency);
+  }
 
-    toCents(): number {
-        return Math.round(this.amount * 100);
+  multiply(factor: number): Money {
+    if (factor < 0) {
+      throw new DomainException('Multiplication factor cannot be negative');
     }
+    return Money.create(this.amount * factor, this.currency);
+  }
 
-    static fromCents(cents: number, currency: string = 'USD'): Money {
-        if (cents < 0) {
-            throw new Error('Cents cannot be negative');
-        }
-        const amount = cents / 100;
-        return new Money(amount, currency.toUpperCase());
+  subtract(other: Money): Money {
+    this.assertSameCurrency(other);
+    const result = this.amount - other.amount;
+    if (result < 0) {
+      throw new DomainException('Result of subtraction cannot be negative');
     }
+    return Money.create(result, this.currency);
+  }
+
+  isGreaterThan(other: Money): boolean {
+    this.assertSameCurrency(other);
+    return this.amount >= other.amount;
+  }
+
+  getAmount(): number {
+    return this.amount;
+  }
+
+  getCurrency(): string {
+    return this.currency;
+  }
+
+  toCents() {
+    return Math.round(this.amount * 100);
+  }
+
+  private assertSameCurrency(other: Money) {
+    if (this.currency !== other.currency) {
+      throw new DomainException(
+        `Currency mismatch: ${this.currency} vs ${this.currency}`,
+      );
+    }
+  }
 }

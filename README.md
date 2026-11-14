@@ -50,6 +50,9 @@ application and its databases in containers instead, start Docker and run:
 docker compose up --build
 ```
 
+The containerized app sends email to the local Mailpit service instead of an
+external SMTP server. View captured messages at `http://localhost:8025`.
+
 Email notifications use `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`,
 and `SMTP_FROM`. `SMTP_SECURE` is optional; when omitted, it defaults to `true`
 for port `465` and `false` for other ports.
@@ -59,7 +62,8 @@ The application is available on port `8079`.
 Swagger UI is available at `/api/docs` (for example, `http://localhost:8079/api/docs`).
 When the application is deployed from `main`, the docs are served by that deployment.
 
-Apply the PostgreSQL migrations before starting the application:
+Compose applies PostgreSQL migrations before starting the application. When
+running NestJS directly on your machine, apply migrations with:
 
 ```bash
 pnpm db:migrate

@@ -168,7 +168,7 @@ describe('customer application handlers', () => {
     await handler.handle(event);
 
     expect(notificationService.sendNotification).toHaveBeenCalledWith({
-      recpientId: 'customer-id',
+      recipientId: 'customer-id',
       subject: 'Welcome',
       message:
         'Hello Ada, welcome to e-commerce. Your account has been created.',

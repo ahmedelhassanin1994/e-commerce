@@ -9,15 +9,44 @@ services:
         condition: service_healthy
       postgres:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+      mailpit:
+        condition: service_started
     environment:
       NODE_ENV: production
       PORT: 8079
+      DATABASE: ${DATABASE:-postgres}
       MONGO_URL: mongodb://mongodb:27017
-      MONGO_DB_NAME: ${DATABASE_NAME}
-      POSTGRES_DATABASE_URL: postgres://postgres:postgres@postgres:5432/${DATABASE_NAME}
-      POSTGRES_CONNECTION_STRING: postgresql://postgres:postgres@postgres:5432/e-commerce
+      MONGO_DB_NAME: clean_shop
+      POSTGRES_DATABASE_URL: postgres://postgres:postgres@postgres:5432/clean_shop
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
+      SMTP_USER: dev
+      SMTP_PASSWORD: dev
+      SMTP_FROM: no-reply@example.com
+      SMTP_SECURE: "false"
     ports:
       - "8079:8079"
+
+  migrate:
+    build:
+      context: .
+      target: migration
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_DATABASE_URL: postgres://postgres:postgres@postgres:5432/clean_shop
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: mailpit
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: "1"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "1"
+    ports:
+      - "8025:8025"
 
   mongodb:
     image: mongo:7
@@ -36,16 +65,16 @@ services:
   postgres:
     image: postgres:17
     container_name: postgres
+    ports:
+      - "5433:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: ${DATABASE_NAME}
-    ports:
-      - "5433:5432"
+      POSTGRES_DB: clean_shop
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d ${DATABASE_NAME}"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
       interval: 5s
       timeout: 5s
       retries: 10

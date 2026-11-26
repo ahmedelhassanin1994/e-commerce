@@ -23,6 +23,6 @@ import { NodemailerEmailAdapter } from './infrastructure/adapters/nodemailer-not
       useClass: NodemailerEmailAdapter,
     },
   ],
-  exports: [],
+  exports: [CUSTOMER_REPOSITORY, NOTIFICATION_SERVICE],
 })
 export class CustomersModule {}

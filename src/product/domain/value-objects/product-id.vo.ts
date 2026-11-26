@@ -1,10 +1,7 @@
-import { UniqueEntityId } from "../../../shared/domain/value-objects/unique-entity-id.js";
+import { UniqueId } from '../../../shared/domain/value-objects/unique-entity-id.js';
 
-
-export class ProductId extends UniqueEntityId{
-
-    constructor(id?: string) {
-        super(id);
-    }
-
+export class ProductId extends UniqueId {
+  constructor(id?: string) {
+    super(id);
+  }
 }

@@ -106,7 +106,9 @@ describe('customer application handlers', () => {
     vi.mocked(repository.findById).mockResolvedValue(customer);
     const handler = new DeleteCustomerHandler(repository);
 
-    await handler.execute(new DeleteCustomerCommand(customer.getId().value));
+    await handler.execute(
+      new DeleteCustomerCommand(customer.getId().getValue()),
+    );
 
     expect(repository.delete).toHaveBeenCalledWith(customer.getId());
   });
@@ -128,7 +130,7 @@ describe('customer application handlers', () => {
     const handler = new GetCustomerHandler(repository);
 
     await expect(
-      handler.execute(new GetCustomerQuery(customer.getId().value)),
+      handler.execute(new GetCustomerQuery(customer.getId().getValue())),
     ).resolves.toBe(customer);
   });
 
@@ -166,7 +168,7 @@ describe('customer application handlers', () => {
     await handler.handle(event);
 
     expect(notificationService.sendNotification).toHaveBeenCalledWith({
-      recpientId: 'customer-id',
+      recipientId: 'customer-id',
       subject: 'Welcome',
       message:
         'Hello Ada, welcome to e-commerce. Your account has been created.',

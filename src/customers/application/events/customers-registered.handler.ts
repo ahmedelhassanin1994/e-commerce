@@ -15,7 +15,7 @@ export class CustomersRegisteredHandler implements IEventHandler<CustomerRegiste
 
   async handle(event: CustomerRegisteredEvent) {
     await this.notificationService.sendNotification({
-      recpientId: event.customerId,
+      recipientId: event.customerId,
       subject: 'Welcome',
       message: `Hello ${event.firstName}, welcome to e-commerce. Your account has been created.`,
     });

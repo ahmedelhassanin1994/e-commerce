@@ -1,28 +1,25 @@
-import { UniqueEntityId } from "./value-objects/unique-entity-id.js";
+import { UniqueId } from './value-objects/unique-entity-id.js';
 
+export abstract class Entity<T extends UniqueId = UniqueId> {
+  protected constructor(public readonly id: T) {}
 
-export abstract class Entity<T extends UniqueEntityId = UniqueEntityId> {
-    protected constructor(public readonly id: T) { }
+  getId(): T {
+    return this.id;
+  }
 
-    getId(): T {
-        return this.id;
+  equals(entity: Entity<T>): boolean {
+    if (entity === null || entity === undefined) {
+      return false;
     }
 
-    equals(entity: Entity<T>): boolean {
-        if (entity === null || entity === undefined) {
-            return false;
-        }
-
-        if (!(entity instanceof Entity)) {
-            return false;
-        }
-
-        return this.id.equals(entity.id);
+    if (!(entity instanceof Entity)) {
+      return false;
     }
 
-    toString(): string {
-        return `${this.constructor.name} [id=${this.id.toString()}]`;
-    }
+    return this.id.equals(entity.id);
+  }
 
-
+  toString(): string {
+    return `${this.constructor.name} [id=${this.id.toString()}]`;
+  }
 }

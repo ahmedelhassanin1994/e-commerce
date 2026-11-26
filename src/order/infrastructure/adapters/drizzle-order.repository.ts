@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { OrderRepositoryPort } from '../../domain/ports/order.repository.port.js';
+import { OrderRepositoryPort } from '../../application/ports/order.repository.port.js';
 import { Order } from '../../domain/entities/order.entity.js';
 import {
   orderItems,
@@ -23,6 +23,18 @@ export class DrizzleOrderRepository implements OrderRepositoryPort {
     @Inject(DRIZZLE)
     private readonly db: DrizzleDb,
   ) {}
+  findById(id: OrderId): Promise<Order | null> {
+    return this.findOrderById(id);
+  }
+  findByCustomerId(customerId: string): Promise<Order[]> {
+    return this.findOrdersByCustomerId(customerId);
+  }
+  findAll(): Promise<Order[]> {
+    return this.findAllOrders();
+  }
+  delete(id: OrderId): Promise<void> {
+    return this.deleteOrder(id);
+  }
 
   async save(order: Order): Promise<void> {
     const orderRow = DrizzleOrderRepository.toOrderPersistence(order);

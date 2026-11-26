@@ -15,7 +15,7 @@ CREATE TABLE "order_items" (
 --> statement-breakpoint
 CREATE TABLE "orders" (
 	"id" uuid PRIMARY KEY NOT NULL,
-	"customer_id" integer NOT NULL,
+	"customer_id" uuid NOT NULL,
 	"status" "order_status" DEFAULT 'pending' NOT NULL,
 	"total_amount" numeric(10, 2) NOT NULL,
 	"total_currency" varchar(3) NOT NULL,

@@ -192,7 +192,7 @@
         },
         "customer_id": {
           "name": "customer_id",
-          "type": "integer",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },

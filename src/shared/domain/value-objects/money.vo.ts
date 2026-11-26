@@ -11,7 +11,7 @@ export class Money {
       throw new DomainException('Money amount cannot be negative');
     }
 
-    const normalized = Math.round(amount * 100) / 100;
+    const normalized = Math.floor(amount * 100) / 100;
     return new Money(normalized, currency.toUpperCase());
   }
 
@@ -46,7 +46,11 @@ export class Money {
 
   isGreaterThan(other: Money): boolean {
     this.assertSameCurrency(other);
-    return this.amount >= other.amount;
+    return this.amount > other.amount;
+  }
+
+  equals(other: Money): boolean {
+    return this.amount === other.amount && this.currency === other.currency;
   }
 
   getAmount(): number {
@@ -64,7 +68,7 @@ export class Money {
   private assertSameCurrency(other: Money) {
     if (this.currency !== other.currency) {
       throw new DomainException(
-        `Currency mismatch: ${this.currency} vs ${this.currency}`,
+        `Currency mismatch: ${this.currency} vs ${other.currency}`,
       );
     }
   }

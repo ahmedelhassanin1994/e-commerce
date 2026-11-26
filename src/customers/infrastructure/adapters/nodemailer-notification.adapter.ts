@@ -42,11 +42,11 @@ export class NodemailerEmailAdapter implements NotificationPort {
 
   async sendNotification(notification: Notification): Promise<void> {
     const customer = await this.customerRepository.findById(
-      new CustomerId(notification.recpientId),
+      new CustomerId(notification.recipientId),
     );
     if (!customer) {
       throw new ApplicationException(
-        `Customer with id ${notification.recpientId} not found`,
+        `Customer with id ${notification.recipientId} not found`,
       );
     }
     const recpient = customer.getEmail();

@@ -1,12 +1,12 @@
 import { DomainException } from '../../../shared/domain/excptions/domain.excption.js';
 
-export type OrderStatusType =
+export type OrderStatusValue =
   'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
 
 export class OrderStatus {
   private static readonly VALID_TRANSITIONS: Record<
-    OrderStatusType,
-    OrderStatusType[]
+    OrderStatusValue,
+    OrderStatusValue[]
   > = {
     pending: ['confirmed', 'cancelled'],
     confirmed: ['shipped', 'cancelled'],
@@ -15,7 +15,7 @@ export class OrderStatus {
     cancelled: [],
   };
 
-  private constructor(private readonly status: OrderStatusType) {}
+  private constructor(private readonly value: OrderStatusValue) {}
 
   static pending(): OrderStatus {
     return new OrderStatus('pending');
@@ -37,12 +37,8 @@ export class OrderStatus {
     return new OrderStatus('cancelled');
   }
 
-  static create(status: OrderStatusType): OrderStatus {
-    return new OrderStatus(status);
-  }
-
-  static fromString(status: string): OrderStatus {
-    const valid: OrderStatusType[] = [
+  static fromString(value: string): OrderStatus {
+    const valid: OrderStatusValue[] = [
       'pending',
       'confirmed',
       'shipped',
@@ -50,51 +46,69 @@ export class OrderStatus {
       'cancelled',
     ];
 
-    if (!valid.includes(status as OrderStatusType)) {
-      throw new DomainException(`Invalid order status: ${status}`);
+    if (!valid.includes(value as OrderStatusValue)) {
+      throw new DomainException(`Invalid order status: ${value}`);
     }
-    return new OrderStatus(status as OrderStatusType);
+
+    return new OrderStatus(value as OrderStatusValue);
   }
 
-  get value(): OrderStatusType {
-    return this.status;
-  }
-
-  equals(other: OrderStatus): boolean {
-    return this.status === other.status;
-  }
-
-  toString(): string {
-    return this.status;
-  }
-
-  private canTransitionTo(newStatus: OrderStatus): boolean {
-    const allowedTransitions = OrderStatus.VALID_TRANSITIONS[this.status];
-    return allowedTransitions.includes(newStatus.value);
-  }
-
-  private transitionTo(newStatus: OrderStatus): OrderStatus {
-    if (!this.canTransitionTo(newStatus)) {
-      throw new DomainException(
-        `Cannot transition from ${this.status} to ${newStatus.value}`,
-      );
-    }
-    return new OrderStatus(newStatus.value);
-  }
-
-  canConfirm() {
-    return this.transitionTo(OrderStatus.confirmed());
+  canConfirm(): boolean {
+    return this.canTransitionTo('confirmed');
   }
 
   canShip(): boolean {
-    return this.canTransitionTo(OrderStatus.shipped());
+    return this.canTransitionTo('shipped');
   }
 
   canDeliver(): boolean {
-    return this.canTransitionTo(OrderStatus.delivered());
+    return this.canTransitionTo('delivered');
   }
 
-  canCancel() {
-    return this.transitionTo(OrderStatus.cancelled());
+  canCancel(): boolean {
+    return this.canTransitionTo('cancelled');
+  }
+
+  confirm(): OrderStatus {
+    return this.transitionTo('confirmed');
+  }
+
+  ship(): OrderStatus {
+    return this.transitionTo('shipped');
+  }
+
+  deliver(): OrderStatus {
+    return this.transitionTo('delivered');
+  }
+
+  cancel(): OrderStatus {
+    return this.transitionTo('cancelled');
+  }
+
+  getValue(): OrderStatusValue {
+    return this.value;
+  }
+
+  equals(other: OrderStatus): boolean {
+    return this.value === other.value;
+  }
+
+  toString(): string {
+    return this.value;
+  }
+
+  private canTransitionTo(target: OrderStatusValue): boolean {
+    const allowed = OrderStatus.VALID_TRANSITIONS[this.value];
+    return allowed.includes(target);
+  }
+
+  private transitionTo(target: OrderStatusValue): OrderStatus {
+    if (!this.canTransitionTo(target)) {
+      throw new DomainException(
+        `Invalid order status transition: cannot transition from ${this.value} to ${target}`,
+      );
+    }
+
+    return new OrderStatus(target);
   }
 }

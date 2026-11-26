@@ -20,9 +20,9 @@ export class ConsoleNotificationAdapter implements NotificationPort {
 
   async sendNotification(notification: Notification): Promise<void> {
     const customer = await this.customerRepository.findById(
-      new CustomerId(notification.recpientId),
+      new CustomerId(notification.recipientId),
     );
-    const recpient = customer?.getEmail() ?? notification.recpientId;
+    const recpient = customer?.getEmail() ?? notification.recipientId;
 
     this.logger.log(
       `[${notification.subject}] to ${recpient} ${notification.message} `,

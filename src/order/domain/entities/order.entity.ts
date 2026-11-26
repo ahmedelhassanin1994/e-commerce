@@ -1,10 +1,15 @@
-import { AggregateRoot } from '@nestjs/cqrs';
 import { OrderId } from '../value-objects/order-id.vo.js';
 import { OrderStatus } from '../value-objects/order-status.vo.js';
 import { OrderItem } from './order-item.entity.js';
 import { ShippingAddress } from '../value-objects/shipping-address.vo.js';
 import { DomainException } from '../../../shared/domain/excptions/domain.excption.js';
 import { Money } from '../../../shared/domain/value-objects/money.vo.js';
+import { OrderPlacedEvent } from '../events/order-placed.event.js';
+import { AggregateRoot } from '../../../shared/domain/Aggregate-root.js';
+import { OrderConfirmedEvent } from '../events/order-confirmed.event.js';
+import { OrderShippedEvent } from '../events/order_shiped.event.js';
+import { OrderDeliveredEvent } from '../events/order-delivered.event.js';
+import { OrderCancelledEvent } from '../events/order-cancelled.event.js';
 
 interface OrderProps {
   id: OrderId;
@@ -18,7 +23,7 @@ interface OrderProps {
   updatedAt: Date;
 }
 
-export class Order extends AggregateRoot<OrderProps> {
+export class Order extends AggregateRoot {
   [x: string]: any;
 
   private readonly _id: OrderId;
@@ -65,6 +70,8 @@ export class Order extends AggregateRoot<OrderProps> {
       createdAt: now,
       updatedAt: now,
     });
+
+    order.apply(new OrderPlacedEvent(id.getValue(), customerId));
     return order;
   }
 
@@ -73,6 +80,10 @@ export class Order extends AggregateRoot<OrderProps> {
   }
   getTotal(): Money {
     return this.getSubtotal();
+  }
+
+  getItemsCount(): number {
+    return this._items.reduce((count, item) => count + item.quantity, 0);
   }
 
   getSubtotal(): Money {
@@ -87,5 +98,85 @@ export class Order extends AggregateRoot<OrderProps> {
 
   get id(): OrderId {
     return this._id;
+  }
+
+  get customerId(): string {
+    return this._customerId;
+  }
+
+  get status(): OrderStatus {
+    return this._status;
+  }
+
+  get items(): OrderItem[] {
+    return this._items;
+  }
+
+  get shippingAddress(): ShippingAddress {
+    return this._shippingAddress;
+  }
+
+  get trackingNumber(): string | null {
+    return this._trackingNumber;
+  }
+
+  get note(): string | null {
+    return this._note;
+  }
+
+  get createdAt(): Date {
+    return this._createdAt;
+  }
+
+  get updatedAt(): Date {
+    return this._updatedAt;
+  }
+
+  confirm(): void {
+    this._status = this._status.confirm();
+    this._updatedAt = new Date();
+
+    this.apply(
+      new OrderConfirmedEvent(this._id.getValue(), this._customerId, {
+        street: this._shippingAddress.street,
+        city: this._shippingAddress.city,
+        state: this._shippingAddress.state,
+        zipCode: this._shippingAddress.zipCode,
+        country: this._shippingAddress.country,
+      }),
+    );
+  }
+
+  ship(trakingNumber: String): void {
+    if (!trakingNumber || trakingNumber.trim().length === 0) {
+      throw new DomainException('traking number is required for shiping');
+    }
+    this._status = this._status.ship();
+    this._trackingNumber = trakingNumber.trim();
+    this._updatedAt = new Date();
+    this.apply(
+      new OrderShippedEvent(
+        this._id.getValue(),
+        this._trackingNumber,
+        this._customerId.toString(),
+      ),
+    );
+  }
+
+  deliver() {
+    this._status = this._status.deliver();
+    this._updatedAt = new Date();
+    this.apply(new OrderDeliveredEvent(this._id.getValue(), this._customerId));
+  }
+
+  cancel(reason: string) {
+    if (!reason || reason.trim().length === 0) {
+      throw new DomainException('A cancellation reason is required');
+    }
+
+    this._status = this._status.cancel();
+    this._updatedAt = new Date();
+
+    this.apply(new OrderCancelledEvent(this._id.getValue(), this._customerId));
   }
 }
